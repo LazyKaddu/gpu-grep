@@ -1,8 +1,10 @@
 mod cli;
+mod gpu;
 mod scanner;
 
 use clap::Parser;
 use cli::Cli;
+use gpu::engine::GpuContext;
 use scanner::mmap::MappedFile;
 
 fn main() {
@@ -23,6 +25,9 @@ fn main() {
     if args.verbose {
         println!("[verbose] Mapped {} bytes", mapped.len());
     }
+
+    // Stage 3: Initialize GPU
+    let _gpu = GpuContext::init(args.verbose);
 
     println!(
         "Searching for \"{}\" in {:?} ({} bytes)...",
