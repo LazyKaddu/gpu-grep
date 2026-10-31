@@ -56,6 +56,7 @@ impl MappedFile {
     }
 
     /// Returns `true` if the mapped file is empty (0 bytes).
+    #[allow(dead_code)]
     pub fn is_empty(&self) -> bool {
         self.mmap.is_empty()
     }

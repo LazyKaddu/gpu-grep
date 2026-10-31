@@ -32,11 +32,16 @@ fn main() {
     // Stage 4 & 5: Buffer Management & Compute Dispatch
     let matches = gpu::buffers::search(&gpu, &mapped, args.pattern.as_bytes(), args.verbose);
 
-    println!(
-        "Found {} match(es) for \"{}\" in {:?} ({} bytes)",
-        matches.len(),
-        args.pattern,
-        args.file,
-        mapped.len()
-    );
+    // Stage 6: The Result Formatter
+    scanner::format::print_matches(mapped.as_bytes(), &matches);
+
+    if args.verbose {
+        println!(
+            "[verbose] Found {} match(es) for \"{}\" in {:?} ({} bytes)",
+            matches.len(),
+            args.pattern,
+            args.file,
+            mapped.len()
+        );
+    }
 }
