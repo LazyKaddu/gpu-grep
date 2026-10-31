@@ -35,5 +35,6 @@ with open(FILE_NAME, 'w') as f:
         if current_gb > last_printed_gb:
             print(f"Progress: {current_gb}GB / 10GB written...")
             last_printed_gb = current_gb
+    f.write("AashishNegi \n")
 
 print(f"\n File generation complete: {FILE_NAME}")

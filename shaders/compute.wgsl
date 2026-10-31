@@ -42,11 +42,14 @@ fn get_byte_at(byte_index: u32) -> u32 {
     return (word >> byte_offset) & 0xFFu;
 }
 
+const MAX_WORKGROUPS_X: u32 = 65535u;
+const WORKGROUP_SIZE: u32 = 256u;
+
 // The compute kernel. We assign 256 threads per workgroup.
 @compute @workgroup_size(256)
 fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
-    // Each thread gets a unique global ID. We map this ID directly to a byte index.
-    let start_byte_index = global_id.x;
+    // Each thread gets a unique global ID mapped to a byte index (supporting 2D dispatch).
+    let start_byte_index = global_id.x + global_id.y * (MAX_WORKGROUPS_X * WORKGROUP_SIZE);
     
     let pattern_length = arrayLength(&pattern);
     let total_bytes = arrayLength(&data) * 4u;

@@ -78,11 +78,18 @@ pub fn extract_matching_lines<'a>(
 
 /// Formats and prints all matching lines to standard output.
 ///
-/// Deduplicates lines containing multiple matches so each matching line
-/// is output exactly once.
+/// Uses buffered I/O for high-throughput printing and handles broken pipes
+/// gracefully (e.g. when piping output to `head` or `less`).
 pub fn print_matches(data: &[u8], match_indices: &[usize]) {
+    use std::io::{self, Write};
+    let stdout = io::stdout();
+    let mut handle = io::BufWriter::new(stdout.lock());
+
     for (_offset, line) in extract_matching_lines(data, match_indices) {
-        println!("{}", line);
+        if writeln!(handle, "{}", line).is_err() {
+            // Broken pipe (e.g. when piped to head, less, or consumer terminates)
+            return;
+        }
     }
 }
 

@@ -11,9 +11,9 @@ fn main() {
     let args = Cli::parse();
 
     if args.verbose {
-        println!("[verbose] Pattern : \"{}\"", args.pattern);
-        println!("[verbose] File    : {:?}", args.file);
-        println!("[verbose] Case-insensitive: {}", args.ignore_case);
+        eprintln!("[verbose] Pattern : \"{}\"", args.pattern);
+        eprintln!("[verbose] File    : {:?}", args.file);
+        eprintln!("[verbose] Case-insensitive: {}", args.ignore_case);
     }
 
     // Stage 2: Zero-copy file mapping
@@ -23,7 +23,7 @@ fn main() {
     });
 
     if args.verbose {
-        println!("[verbose] Mapped {} bytes", mapped.len());
+        eprintln!("[verbose] Mapped {} bytes", mapped.len());
     }
 
     // Stage 3: Initialize GPU
@@ -36,7 +36,7 @@ fn main() {
     scanner::format::print_matches(mapped.as_bytes(), &matches);
 
     if args.verbose {
-        println!(
+        eprintln!(
             "[verbose] Found {} match(es) for \"{}\" in {:?} ({} bytes)",
             matches.len(),
             args.pattern,

@@ -1,1 +1,9 @@
 /target
+
+
+/benchmark/*.log
+/benchmark/*.txt
+/benchmark/*.csv
+
+
+/benchmarks/results/
