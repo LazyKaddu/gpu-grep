@@ -56,9 +56,9 @@ impl GpuContext {
 
         if verbose {
             let info = adapter.get_info();
-            println!("[verbose] GPU adapter : {}", info.name);
-            println!("[verbose] Backend     : {:?}", info.backend);
-            println!("[verbose] Driver      : {}", info.driver);
+            eprintln!("[verbose] GPU adapter : {}", info.name);
+            eprintln!("[verbose] Backend     : {:?}", info.backend);
+            eprintln!("[verbose] Driver      : {}", info.driver);
         }
 
         // Step 3: Request the device and queue
@@ -78,7 +78,7 @@ impl GpuContext {
             });
 
         if verbose {
-            println!("[verbose] GPU device ready");
+            eprintln!("[verbose] GPU device ready");
         }
 
         Self { device, queue }

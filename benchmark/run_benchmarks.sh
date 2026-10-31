@@ -5,7 +5,7 @@ set -e
 cd "$(dirname "$0")/.."
 
 DATASET="benchmark/massive_test.log"
-PATTERN="FATAL_CRASH_ERR_509"
+PATTERN="AashishNegi"
 
 echo "building gpu-grep release binary..."
 cargo build --release

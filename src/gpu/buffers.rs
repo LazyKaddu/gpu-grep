@@ -147,8 +147,9 @@ impl GpuScanner {
         // 5. Calculate Chunk Buffer Size respecting hardware limits and overlap
         let max_storage = context.device.limits().max_storage_buffer_binding_size as usize;
         let overlap = pattern.len().saturating_sub(1);
-        let target_chunk = target_chunk_size.min(max_storage.saturating_sub(overlap));
-        let chunk_size = file_len.min(target_chunk).max(64).next_multiple_of(4);
+        let max_buf_capacity = target_chunk_size.min(max_storage) & !3;
+        let max_step = (max_buf_capacity.saturating_sub(overlap)) & !3;
+        let chunk_size = file_len.min(max_step).max(64) & !3;
         let data_buf_size = ((chunk_size + overlap) as u64).next_multiple_of(4);
 
         let data_buf = context.device.create_buffer(&BufferDescriptor {
@@ -196,7 +197,7 @@ impl GpuScanner {
         });
 
         if verbose {
-            println!(
+            eprintln!(
                 "[verbose] Buffers allocated in {:?} (chunk buffer: {} MB, max binding: {} MB)",
                 alloc_start.elapsed(),
                 chunk_size / (1024 * 1024),
@@ -282,8 +283,14 @@ impl GpuScanner {
                 });
                 pass.set_pipeline(&self.pipeline);
                 pass.set_bind_group(0, &self.bind_group, &[]);
-                let workgroups = ((chunk.len() as u32) + 255) / 256;
-                pass.dispatch_workgroups(workgroups.max(1), 1, 1);
+                let total_workgroups = ((chunk.len() as u32) + 255) / 256;
+                let max_wg_x = 65535u32;
+                let (wg_x, wg_y) = if total_workgroups <= max_wg_x {
+                    (total_workgroups.max(1), 1)
+                } else {
+                    (max_wg_x, (total_workgroups + max_wg_x - 1) / max_wg_x)
+                };
+                pass.dispatch_workgroups(wg_x, wg_y, 1);
             }
 
             // Copy results from storage buffer to staging buffer
@@ -341,11 +348,11 @@ impl GpuScanner {
         all_matches.dedup();
 
         if verbose {
-            println!("[verbose] Chunks processed : {}", total_chunks);
-            println!("[verbose] PCIe DMA upload  : {:?}", dma_duration);
-            println!("[verbose] GPU compute time : {:?}", compute_duration);
-            println!("[verbose] Total search time: {:?}", start_time.elapsed());
-            println!("[verbose] Matches found    : {}", all_matches.len());
+            eprintln!("[verbose] Chunks processed : {}", total_chunks);
+            eprintln!("[verbose] PCIe DMA upload  : {:?}", dma_duration);
+            eprintln!("[verbose] GPU compute time : {:?}", compute_duration);
+            eprintln!("[verbose] Total search time: {:?}", start_time.elapsed());
+            eprintln!("[verbose] Matches found    : {}", all_matches.len());
         }
 
         all_matches
