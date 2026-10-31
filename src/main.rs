@@ -27,10 +27,14 @@ fn main() {
     }
 
     // Stage 3: Initialize GPU
-    let _gpu = GpuContext::init(args.verbose);
+    let gpu = GpuContext::init(args.verbose);
+
+    // Stage 4 & 5: Buffer Management & Compute Dispatch
+    let matches = gpu::buffers::search(&gpu, &mapped, args.pattern.as_bytes(), args.verbose);
 
     println!(
-        "Searching for \"{}\" in {:?} ({} bytes)...",
+        "Found {} match(es) for \"{}\" in {:?} ({} bytes)",
+        matches.len(),
         args.pattern,
         args.file,
         mapped.len()
